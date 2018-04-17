@@ -5,7 +5,7 @@ import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.ConcurrentLinkedDeque
 
-class DeviceClientServiceTest {
+class DeviceClientTest {
 
     companion object {
         val PORT = 5000

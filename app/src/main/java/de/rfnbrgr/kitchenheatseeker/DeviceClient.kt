@@ -35,6 +35,9 @@ class DeviceClient(val host: String, val port: Int, val queue: Queue<HeatFrame>)
             try {
                 val line = reader.readLine()
                 println("Read $line")
+                if (line == null) {
+                    continue
+                }
                 val frame = deserialize(line)
                 if (frame != null) {
                     queue.offer(frame)
