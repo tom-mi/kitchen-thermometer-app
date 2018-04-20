@@ -1,4 +1,4 @@
-package de.rfnbrgr.kitchenheatseeker
+package de.rfnbrgr.kitchenthermometer
 
 import android.app.Activity
 import android.os.Bundle

@@ -1,4 +1,4 @@
-package de.rfnbrgr.kitchenheatseeker
+package de.rfnbrgr.kitchenthermometer
 
 import android.graphics.Color
 import android.support.test.runner.AndroidJUnit4

@@ -5,7 +5,7 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "de.rfnbrgr.kitchenheatseeker"
+        applicationId "de.rfnbrgr.kitchenthermometer"
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 1

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="de.rfnbrgr.kitchenheatseeker.HeatDisplay">
+    tools:context="de.rfnbrgr.kitchenthermometer.HeatDisplay">
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/constraintLayout"
@@ -53,7 +53,7 @@
             app:layout_constraintGuide_begin="20dp" />
     </android.support.constraint.ConstraintLayout>
 
-    <de.rfnbrgr.kitchenheatseeker.HeatmapView
+    <de.rfnbrgr.kitchenthermometer.HeatmapView
         android:id="@+id/heatmap"
         android:layout_width="0dp"
         android:layout_height="0dp"

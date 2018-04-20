@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="de.rfnbrgr.kitchenheatseeker">
+    package="de.rfnbrgr.kitchenthermometer">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <application
@@ -11,15 +11,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".HeatDisplay">
+        <activity android:name="de.rfnbrgr.kitchenthermometer.HeatDisplay">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SettingsActivity" />
+        <activity android:name="de.rfnbrgr.kitchenthermometer.SettingsActivity" />
 
-        <service android:name=".DeviceClientService" />
+        <service android:name="de.rfnbrgr.kitchenthermometer.DeviceClientService" />
     </application>
 
 </manifest>
