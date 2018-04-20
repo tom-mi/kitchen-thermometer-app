@@ -3,7 +3,6 @@ package de.rfnbrgr.kitchenheatseeker
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
-import java.util.concurrent.ConcurrentLinkedDeque
 
 class DeviceClientTest {
 
@@ -20,9 +19,9 @@ class DeviceClientTest {
 
     @Test
     fun receives_frames() {
-        val queue = ConcurrentLinkedDeque<HeatFrame>()
+        val results: MutableList<HeatFrame> = mutableListOf()
 
-        val client = DeviceClient("localhost", PORT, queue)
+        val client = DeviceClient("localhost", PORT, { frame -> results.add(frame) }, {})
 
         val thread = Thread(client)
         thread.start()
@@ -35,8 +34,6 @@ class DeviceClientTest {
 
         client.stop()
         thread.join()
-
-        val results = queue.toList()
 
         assertEquals(results.size, 2)
 

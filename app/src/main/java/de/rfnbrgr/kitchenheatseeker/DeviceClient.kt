@@ -1,16 +1,26 @@
 package de.rfnbrgr.kitchenheatseeker
 
+import android.util.Log
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.Socket
 import java.net.SocketTimeoutException
-import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 
-class DeviceClient(val host: String, val port: Int, val queue: Queue<HeatFrame>) : Runnable {
+class DeviceClient(private val host: String, private val port: Int,
+                   private val frameCallback: (HeatFrame) -> Unit,
+                   private val stateCallback: (ClientState) -> Unit) : Runnable {
+
+    enum class ClientState {
+        CONNECTING,
+        CONNECTED,
+        NOT_CONNECTED,
+        FAILED,
+        UNKNOWN,
+    }
 
     companion object {
         const val READ_TIMEOUT_MS = 500
@@ -28,7 +38,19 @@ class DeviceClient(val host: String, val port: Int, val queue: Queue<HeatFrame>)
 
     override fun run() {
         println("Starting client")
+        try {
+            connectAndRun()
+            stateCallback(ClientState.NOT_CONNECTED)
+        } catch (e: Exception) {
+            Log.e(javaClass.simpleName, "Failed to connect to [$host]", e)
+            stateCallback(ClientState.FAILED)
+        }
+    }
+
+    private fun connectAndRun() {
+        stateCallback(ClientState.CONNECTING)
         val client = Socket(host, port)
+        stateCallback(ClientState.CONNECTED)
         client.soTimeout = READ_TIMEOUT_MS
         val reader = BufferedReader(InputStreamReader(client.getInputStream()))
         while (running.get()) {
@@ -40,7 +62,7 @@ class DeviceClient(val host: String, val port: Int, val queue: Queue<HeatFrame>)
                 }
                 val frame = deserialize(line)
                 if (frame != null) {
-                    queue.offer(frame)
+                    frameCallback(frame)
                 }
             } catch (e: SocketTimeoutException) {
                 // retry
@@ -54,7 +76,6 @@ class DeviceClient(val host: String, val port: Int, val queue: Queue<HeatFrame>)
     private fun deserialize(json: String): HeatFrame? {
         return heatFrameAdapter.fromJson(json)
     }
-
 
 }
 

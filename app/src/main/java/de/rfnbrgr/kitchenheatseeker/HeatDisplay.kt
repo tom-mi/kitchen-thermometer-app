@@ -1,69 +1,57 @@
 package de.rfnbrgr.kitchenheatseeker
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
-import android.os.HandlerThread
+import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import kotlinx.android.synthetic.main.activity_heat_display.*
-import java.util.concurrent.ConcurrentLinkedQueue
 
 class HeatDisplay : AppCompatActivity() {
-    companion object {
-        val DEFAULT_PORT = 5000
-        const val HOSTNAME = "hostname"
-        const val PORT = "port"
-    }
 
-    private var deviceClient: DeviceClient? = null
-    private var deviceClientThread: Thread? = null
-    private var frameQueue = ConcurrentLinkedQueue<HeatFrame>()
-    private var hostname: String = "localhost"
-    private var port: Int = DEFAULT_PORT
-
-    private val handlerThread = HandlerThread("HeatDisplayHandler")
-    private var handler: Handler? = null
-
-    inner class HeatFrameUpdater : Runnable {
-        override fun run() {
-            try {
-                Log.d(javaClass.simpleName, "Currently ${frameQueue.size} items in queue")
-                val frame = frameQueue.last()
-                frameQueue.clear()
+    private val receiver = object: BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == HEAT_FRAME_ACTION) {
+                val frame = intent.getParcelableExtra<HeatFrame>(HEAT_FRAME_PAYLOAD)
                 heatmap.setFrame(frame)
-            } catch (e: NoSuchElementException) {
-                // do nothing
+                textClientStatus.text = "Receiving"
             }
-            handler!!.postDelayed(this, 1000L)
+            if (intent?.action == CLIENT_STATE_ACTION) {
+                val state = intent.getSerializableExtra(CLIENT_STATE_PAYLOAD) as DeviceClient.ClientState
+                textClientStatus.text = state.toString()
+            }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
+
         setContentView(R.layout.activity_heat_display)
-        hostname = intent.getStringExtra(HOSTNAME)
-        port = intent.getIntExtra(PORT, DEFAULT_PORT)
-        textHostname.text = hostname
-        deviceClient = DeviceClient(hostname, port, frameQueue)
-        heatmap.colorStops = mapOf(0f to Color.BLUE, 20f to Color.GREEN, 50f to Color.YELLOW, 100f to Color.RED)
-        heatmap.smooth = true
-        Log.d("Display", "heatmap width: ${heatmap.width}")
-        handlerThread.start()
-        Log.d(javaClass.simpleName, "Started handler thread in ${Thread.currentThread()}")
-        handler = Handler(handlerThread.looper)
+
+        configureHeatmap()
     }
 
     override fun onStart() {
         super.onStart()
-        deviceClientThread = Thread(DeviceClient(hostname, port, frameQueue))
-        deviceClientThread!!.start()
         Log.d("Display", "heatmap width2: ${heatmap.width}")
-        handler!!.post(HeatFrameUpdater())
+        val filter = IntentFilter()
+        filter.addAction(HEAT_FRAME_ACTION)
+        filter.addAction(CLIENT_STATE_ACTION)
+        registerReceiver(receiver, filter)
     }
 
     override fun onStop() {
         super.onStop()
-        deviceClient!!.stop()
+        unregisterReceiver(receiver)
+    }
+
+    private fun configureHeatmap() {
+        heatmap.colorStops = mapOf(0f to Color.BLUE, 20f to Color.GREEN, 50f to Color.YELLOW, 100f to Color.RED)
+        heatmap.smooth = getPreferences(Context.MODE_PRIVATE).getBoolean(getString(R.string.pref_smoothHeatmap), false)
     }
 }
