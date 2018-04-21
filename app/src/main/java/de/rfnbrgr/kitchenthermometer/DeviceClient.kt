@@ -5,6 +5,7 @@ import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.net.InetSocketAddress
 import java.net.Socket
 import java.net.SocketTimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
@@ -24,6 +25,7 @@ class DeviceClient(private val host: String, private val port: Int,
 
     companion object {
         const val READ_TIMEOUT_MS = 500
+        const val CONNECT_TIMEOUT_MS = 500
     }
 
     private var running: AtomicBoolean = AtomicBoolean(true)
@@ -37,7 +39,7 @@ class DeviceClient(private val host: String, private val port: Int,
     }
 
     override fun run() {
-        println("Starting client")
+        Log.d(javaClass.simpleName, "Starting client")
         try {
             connectAndRun()
             stateCallback(ClientState.NOT_CONNECTED)
@@ -49,28 +51,32 @@ class DeviceClient(private val host: String, private val port: Int,
 
     private fun connectAndRun() {
         stateCallback(ClientState.CONNECTING)
-        val client = Socket(host, port)
-        stateCallback(ClientState.CONNECTED)
-        client.soTimeout = READ_TIMEOUT_MS
-        val reader = BufferedReader(InputStreamReader(client.getInputStream()))
-        while (running.get()) {
-            try {
-                val line = reader.readLine()
-                println("Read $line")
-                if (line == null) {
-                    continue
+        val client = Socket()
+        try {
+            client.soTimeout = READ_TIMEOUT_MS
+            client.connect(InetSocketAddress(host, port), CONNECT_TIMEOUT_MS)
+            stateCallback(ClientState.CONNECTED)
+            val reader = BufferedReader(InputStreamReader(client.getInputStream()))
+            while (running.get()) {
+                try {
+                    val line = reader.readLine()
+                    if (line == null) {
+                        continue
+                    }
+                    val frame = deserialize(line)
+                    if (frame != null) {
+                        frameCallback(frame)
+                    }
+                } catch (e: SocketTimeoutException) {
+                    // retry
                 }
-                val frame = deserialize(line)
-                if (frame != null) {
-                    frameCallback(frame)
-                }
-            } catch (e: SocketTimeoutException) {
-                // retry
             }
+        } finally {
+            Log.d(javaClass.simpleName, "Closing connection")
+            client.close()
+            Log.d(javaClass.simpleName, "Closed connection")
         }
-        println("Closing connection")
-        client.close()
-        println("Closed connection")
+
     }
 
     private fun deserialize(json: String): HeatFrame? {

@@ -4,7 +4,6 @@ import android.animation.ArgbEvaluator
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolator
 import java.lang.Math.max
@@ -15,31 +14,30 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
     private var frame: HeatFrame = HeatFrame()
 
     var colorStops: Map<Float, Int> = mapOf(0f to Color.BLACK, 1f to Color.WHITE)
+    var interpolate: Boolean = false
     var smooth: Boolean = false
 
     private val bitmapPaintPixels = Paint()
+    private val bitmapPaintPixelsSmooth = Paint()
     private var bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     private var bitmapRect = Rect(0, 0, bitmap.width, bitmap.height)
     private var drawingRect = Rect(0, 0, 0, 0)
 
     companion object {
-        private val smoothPixelMultiplier = 5
+        private val interpolatePixelMultiplier = 5
     }
 
     init {
         bitmapPaintPixels.isAntiAlias = false
         bitmapPaintPixels.isDither = false
         bitmapPaintPixels.isFilterBitmap = false
+        bitmapPaintPixelsSmooth.isAntiAlias = false
+        bitmapPaintPixelsSmooth.isDither = false
+        bitmapPaintPixelsSmooth.isFilterBitmap = true
     }
 
     fun setFrame(newFrame: HeatFrame) {
-        Log.d(javaClass.name, "Setting frame")
         frame = newFrame
-        val pixelMultiplier = if (smooth) smoothPixelMultiplier else 1
-        if (frame.width * pixelMultiplier != bitmap.width || frame.height * pixelMultiplier != bitmap.height) {
-            bitmap = Bitmap.createBitmap(frame.width * pixelMultiplier, frame.height * pixelMultiplier, Bitmap.Config.ARGB_8888)
-            bitmapRect = Rect(0, 0, bitmap.width, bitmap.height)
-        }
         calculateScaleAndOffset()
         invalidate()
     }
@@ -55,12 +53,21 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
             return
         }
 
-        if (smooth) {
-            setBitmapPixelsSmooth(frame)
+        if (interpolate) {
+            createBitmap(interpolatePixelMultiplier)
+            setBitmapPixelsInterpolate(frame)
         } else {
+            createBitmap(1)
             setBitmapPixels(frame)
         }
         drawBitmapWithColors(canvas, bitmap)
+    }
+
+    private fun createBitmap(pixelMultiplier: Int) {
+        if (frame.width * pixelMultiplier != bitmap.width || frame.height * pixelMultiplier != bitmap.height) {
+            bitmap = Bitmap.createBitmap(frame.width * pixelMultiplier, frame.height * pixelMultiplier, Bitmap.Config.ARGB_8888)
+            bitmapRect = Rect(0, 0, bitmap.width, bitmap.height)
+        }
     }
 
     private fun setBitmapPixels(frame: HeatFrame) {
@@ -72,7 +79,7 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
         }
     }
 
-    private fun setBitmapPixelsSmooth(frame: HeatFrame) {
+    private fun setBitmapPixelsInterpolate(frame: HeatFrame) {
         val xVal = (0 until frame.width).map { 0.5 + it }.toDoubleArray()
         val yVal = (0 until frame.height).map { 0.5 + it }.toDoubleArray()
         val fVal = (0 until frame.width).map { i ->
@@ -84,10 +91,10 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
         val f = PiecewiseBicubicSplineInterpolator().interpolate(xVal, yVal, fVal)
 
 
-        for (i in 0 until frame.width * smoothPixelMultiplier) {
-            for (j in 0 until frame.height * smoothPixelMultiplier) {
-                val x = max(xVal.first(), min(xVal.last(), i.toDouble() / smoothPixelMultiplier))
-                val y = max(yVal.first(), min(yVal.last(), j.toDouble() / smoothPixelMultiplier))
+        for (i in 0 until frame.width * interpolatePixelMultiplier) {
+            for (j in 0 until frame.height * interpolatePixelMultiplier) {
+                val x = max(xVal.first(), min(xVal.last(), i.toDouble() / interpolatePixelMultiplier))
+                val y = max(yVal.first(), min(yVal.last(), j.toDouble() / interpolatePixelMultiplier))
                 val color = interpolate(colorStops, f.value(x, y).toFloat())
                 bitmap.setPixel(i, j, color)
             }
@@ -96,7 +103,8 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
 
     private fun drawBitmapWithColors(canvas: Canvas?, bitmap: Bitmap) {
         val rect = Rect(0, 0, bitmap.width, bitmap.height)
-        canvas?.drawBitmap(bitmap, rect, drawingRect, bitmapPaintPixels)
+        val paint = if (smooth) bitmapPaintPixelsSmooth else bitmapPaintPixels
+        canvas?.drawBitmap(bitmap, rect, drawingRect, paint)
     }
 
     private fun calculateScaleAndOffset() {

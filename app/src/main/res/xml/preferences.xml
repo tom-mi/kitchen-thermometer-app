@@ -1,10 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference
-        android:key="pref_hostname"
-        android:title="@string/pref_hostname"/>
+    <PreferenceCategory
+        android:key="pref_connection"
+        android:title="@string/pref_connection_title">
+
+        <de.rfnbrgr.kitchenthermometer.BetterEditTextPreference
+            android:inputType="text"
+            android:key="@string/pref_hostname"
+            android:maxLines="1"
+            android:summary="%s"
+            android:title="@string/pref_hostname_title" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="pref_heatmap"
+        android:title="@string/pref_heatmap_title">
     <CheckBoxPreference
-        android:key="pref_smoothHeatmap"
-        android:title="@string/pref_smoothHeatmap"
-        android:defaultValue="false"/>
+        android:defaultValue="true"
+        android:key="@string/pref_interpolate_heatmap"
+        android:title="@string/pref_interpolate_heatmap_title" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/pref_smooth_heatmap"
+        android:title="@string/pref_smooth_heatmap_title" />
+    </PreferenceCategory>
+
 </PreferenceScreen>

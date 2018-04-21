@@ -18,8 +18,6 @@ class HeatmapViewTest {
         assertEquals(Color.BLACK, interpolate(colorStops, 0.2f))
         assertEquals(Color.WHITE, interpolate(colorStops, 1f))
         assertEquals(Color.WHITE, interpolate(colorStops, 2f))
-
-        assertEquals(0xFF800000.toInt(), interpolate(colorStops, 0.6f))
     }
 
 }
