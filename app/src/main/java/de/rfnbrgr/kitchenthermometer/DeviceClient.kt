@@ -39,12 +39,12 @@ class DeviceClient(private val host: String, private val port: Int,
     }
 
     override fun run() {
-        Log.d(javaClass.simpleName, "Starting client")
+        Log.d(javaClass.simpleName, "${Thread.currentThread().name}: Starting client")
         try {
             connectAndRun()
             stateCallback(ClientState.NOT_CONNECTED)
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, "Failed to connect to [$host]", e)
+            Log.e(javaClass.simpleName, "${Thread.currentThread().name}: Failed to connect to [$host]", e)
             stateCallback(ClientState.FAILED)
         }
     }
@@ -59,10 +59,7 @@ class DeviceClient(private val host: String, private val port: Int,
             val reader = BufferedReader(InputStreamReader(client.getInputStream()))
             while (running.get()) {
                 try {
-                    val line = reader.readLine()
-                    if (line == null) {
-                        continue
-                    }
+                    val line = reader.readLine() ?: continue
                     val frame = deserialize(line)
                     if (frame != null) {
                         frameCallback(frame)
@@ -72,9 +69,9 @@ class DeviceClient(private val host: String, private val port: Int,
                 }
             }
         } finally {
-            Log.d(javaClass.simpleName, "Closing connection")
+            Log.d(javaClass.simpleName, "${Thread.currentThread().name}: Closing connection")
             client.close()
-            Log.d(javaClass.simpleName, "Closed connection")
+            Log.d(javaClass.simpleName, "${Thread.currentThread().name}: Closed connection")
         }
 
     }

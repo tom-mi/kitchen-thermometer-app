@@ -17,7 +17,7 @@ class HeatDisplay : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCha
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == HEAT_FRAME_ACTION) {
-                val frame = intent.getParcelableExtra<HeatFrame>(HEAT_FRAME_PAYLOAD)
+                val frame = intent.getParcelableExtra<EnrichedHeatFrame>(HEAT_FRAME_PAYLOAD)
                 heatmap.setFrame(frame)
             }
             if (intent?.action == CLIENT_STATE_ACTION) {
@@ -72,7 +72,7 @@ class HeatDisplay : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCha
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         Log.d(javaClass.simpleName, "Preference for key $key changed")
-        if (key == getString(R.string.pref_smooth_heatmap) || key == getString(R.string.pref_interpolate_heatmap)) {
+        if (key == getString(R.string.pref_smooth_heatmap)) {
             configureHeatmap()
         }
     }
@@ -118,6 +118,5 @@ class HeatDisplay : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCha
         val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
         heatmap.colorStops = mapOf(0f to Color.BLUE, 20f to Color.GREEN, 50f to Color.YELLOW, 100f to Color.RED)
         heatmap.smooth = sharedPref.getBoolean(getString(R.string.pref_smooth_heatmap), false)
-        heatmap.interpolate = sharedPref.getBoolean(getString(R.string.pref_interpolate_heatmap), false)
     }
 }

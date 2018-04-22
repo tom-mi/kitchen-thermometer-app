@@ -5,16 +5,13 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
-import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolator
-import java.lang.Math.max
 import java.lang.Math.min
 
 class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
-    private var frame: HeatFrame = HeatFrame()
+    private var frame: EnrichedHeatFrame = EnrichedHeatFrame()
 
     var colorStops: Map<Float, Int> = mapOf(0f to Color.BLACK, 1f to Color.WHITE)
-    var interpolate: Boolean = false
     var smooth: Boolean = false
 
     private val bitmapPaintPixels = Paint()
@@ -23,9 +20,6 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
     private var bitmapRect = Rect(0, 0, bitmap.width, bitmap.height)
     private var drawingRect = Rect(0, 0, 0, 0)
 
-    companion object {
-        private val interpolatePixelMultiplier = 5
-    }
 
     init {
         bitmapPaintPixels.isAntiAlias = false
@@ -36,7 +30,7 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
         bitmapPaintPixelsSmooth.isFilterBitmap = true
     }
 
-    fun setFrame(newFrame: HeatFrame) {
+    fun setFrame(newFrame: EnrichedHeatFrame) {
         frame = newFrame
         calculateScaleAndOffset()
         invalidate()
@@ -53,50 +47,23 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
             return
         }
 
-        if (interpolate) {
-            createBitmap(interpolatePixelMultiplier)
-            setBitmapPixelsInterpolate(frame)
-        } else {
-            createBitmap(1)
-            setBitmapPixels(frame)
-        }
+        createBitmap()
+        setBitmapPixels(frame)
         drawBitmapWithColors(canvas, bitmap)
     }
 
-    private fun createBitmap(pixelMultiplier: Int) {
-        if (frame.width * pixelMultiplier != bitmap.width || frame.height * pixelMultiplier != bitmap.height) {
-            bitmap = Bitmap.createBitmap(frame.width * pixelMultiplier, frame.height * pixelMultiplier, Bitmap.Config.ARGB_8888)
+    private fun createBitmap() {
+        if (frame.width != bitmap.width || frame.height != bitmap.height) {
+            bitmap = Bitmap.createBitmap(frame.width, frame.height, Bitmap.Config.ARGB_8888)
             bitmapRect = Rect(0, 0, bitmap.width, bitmap.height)
         }
     }
 
-    private fun setBitmapPixels(frame: HeatFrame) {
+    private fun setBitmapPixels(frame: EnrichedHeatFrame) {
         for (x in 0..(frame.width - 1)) {
             for (y in 0..(frame.height - 1)) {
-                val color = interpolate(colorStops, frame.temperatures[x + y * frame.height])
+                val color = interpolate(colorStops, frame.temperatures[x][y])
                 bitmap.setPixel(x, y, color)
-            }
-        }
-    }
-
-    private fun setBitmapPixelsInterpolate(frame: HeatFrame) {
-        val xVal = (0 until frame.width).map { 0.5 + it }.toDoubleArray()
-        val yVal = (0 until frame.height).map { 0.5 + it }.toDoubleArray()
-        val fVal = (0 until frame.width).map { i ->
-            (0 until frame.height).map { j ->
-                frame.temperatures[i + frame.width * j].toDouble()
-            }.toDoubleArray()
-        }.toTypedArray()
-
-        val f = PiecewiseBicubicSplineInterpolator().interpolate(xVal, yVal, fVal)
-
-
-        for (i in 0 until frame.width * interpolatePixelMultiplier) {
-            for (j in 0 until frame.height * interpolatePixelMultiplier) {
-                val x = max(xVal.first(), min(xVal.last(), i.toDouble() / interpolatePixelMultiplier))
-                val y = max(yVal.first(), min(yVal.last(), j.toDouble() / interpolatePixelMultiplier))
-                val color = interpolate(colorStops, f.value(x, y).toFloat())
-                bitmap.setPixel(i, j, color)
             }
         }
     }

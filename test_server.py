@@ -56,7 +56,7 @@ def handle(conn):
 
 def randomize(pixels):
     for i in range(len(pixels)):
-        pixels[i] += random.random() - 0.5
+        pixels[i] += (random.random() - 0.5) * 10
         pixels[i] = max(0, min(100., pixels[i]))
 
 

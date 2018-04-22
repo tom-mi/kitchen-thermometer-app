@@ -25,11 +25,15 @@ class DeviceClientService : Service() {
     private var preferencesListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
 
     private var currentHostname: String = ""
+    @Volatile private var interpolate: Boolean = false
 
     override fun onCreate() {
         preferencesListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             if (key == getString(R.string.pref_hostname)) {
                 restartDeviceClientThread()
+            }
+            if (key == getString(R.string.pref_interpolate_heatmap)) {
+                configureInterpolation()
             }
         }
     }
@@ -39,9 +43,10 @@ class DeviceClientService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d(javaClass.simpleName, "Starting service")
+        Log.d(javaClass.simpleName, "${Thread.currentThread().name}: Starting service")
         val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
         sharedPref.registerOnSharedPreferenceChangeListener(preferencesListener)
+        configureInterpolation()
         restartDeviceClientThread()
 
         return START_STICKY  // TODO is that correct?
@@ -51,6 +56,7 @@ class DeviceClientService : Service() {
         super.onDestroy()
         val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
         sharedPref.unregisterOnSharedPreferenceChangeListener(preferencesListener)
+        stopDeviceClientThread()
     }
 
     private fun startDeviceClientThread() {
@@ -64,20 +70,26 @@ class DeviceClientService : Service() {
     }
 
     private fun stopDeviceClientThread() {
-        Log.d(javaClass.simpleName, "Stopping device client")
+        Log.d(javaClass.simpleName, "Stopping device client ${deviceClientThread?.name}")
         deviceClient?.stop()
-        deviceClientThread?.join()
-        Log.d(javaClass.simpleName, "Stopped device client")
+        deviceClientThread?.join(1000)
+        Log.d(javaClass.simpleName, "Stopped device client: ${deviceClientThread?.isAlive}")
     }
 
-    private fun restartDeviceClientThread() {
+    @Synchronized private fun restartDeviceClientThread() {
         stopDeviceClientThread()
         startDeviceClientThread()
     }
 
+    private fun configureInterpolation() {
+        val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+        interpolate = sharedPref.getBoolean(getString(R.string.pref_interpolate_heatmap), false)
+    }
+
     private fun sendFrame(frame: HeatFrame) {
         val intent = Intent(HEAT_FRAME_ACTION)
-        intent.putExtra(HEAT_FRAME_PAYLOAD, frame)
+        val enrichedFrame = enrichHeatFrame(frame, interpolate)
+        intent.putExtra(HEAT_FRAME_PAYLOAD, enrichedFrame)
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
