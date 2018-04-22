@@ -37,7 +37,7 @@
             android:defaultValue="0"
             android:key="@string/pref_temperature_range_min"
             android:maxLines="1"
-            android:summary="%s"
+            android:summary="@string/celsius_temperature_summary"
             android:title="@string/pref_temperature_range_min_title" />
         <de.rfnbrgr.kitchenthermometer.BetterEditTextPreference
             android:dependency=""
@@ -45,7 +45,7 @@
             android:defaultValue="100"
             android:key="@string/pref_temperature_range_max"
             android:maxLines="1"
-            android:summary="%s"
+            android:summary="@string/celsius_temperature_summary"
             android:title="@string/pref_temperature_range_max_title" />
     </PreferenceCategory>
 

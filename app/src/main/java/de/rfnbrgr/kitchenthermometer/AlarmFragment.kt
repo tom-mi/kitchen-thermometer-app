@@ -8,8 +8,6 @@ import android.support.v4.content.LocalBroadcastManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import de.rfnbrgr.kitchenthermometer.AlarmSettingsFragment.Companion.TEMPERATURE_RANGE_MAX_ARGUMENT
-import de.rfnbrgr.kitchenthermometer.AlarmSettingsFragment.Companion.TEMPERATURE_RANGE_MIN_ARGUMENT
 import kotlinx.android.synthetic.main.fragment_alarm.*
 
 class AlarmFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
@@ -41,10 +39,7 @@ class AlarmFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
         super.onResume()
         configureAlarmView()
         editAlarmsButton.setOnClickListener {
-            val intent = Intent(this.activity, AlarmSettingsActivity::class.java)
-            intent.putExtra(TEMPERATURE_RANGE_MIN_ARGUMENT, temperatureRange.first)
-            intent.putExtra(TEMPERATURE_RANGE_MAX_ARGUMENT, temperatureRange.second)
-            startActivity(intent)
+            startActivity(Intent(this.activity, AlarmSettingsActivity::class.java))
         }
         LocalBroadcastManager.getInstance(activity).registerReceiver(receiver, IntentFilter(HEAT_FRAME_ACTION))
     }
@@ -64,10 +59,12 @@ class AlarmFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
 
     private fun configureAlarmView() {
         val sharedPref = PreferenceManager.getDefaultSharedPreferences(this.activity)
-        val lowerLimit = sharedPref.getInt(getString(R.string.pref_alarm_lower_limit), 10).toFloat()
-        val upperLimit = sharedPref.getInt(getString(R.string.pref_alarm_upper_limit), 40).toFloat()
+        val lowerLimit = getFloatPreference(this.activity, getString(R.string.pref_alarm_lower_limit))
+        val upperLimit = getFloatPreference(this.activity, getString(R.string.pref_alarm_upper_limit))
+        val lowerEnabled = sharedPref.getBoolean(getString(R.string.pref_alarm_lower_enabled), false)
+        val upperEnabled = sharedPref.getBoolean(getString(R.string.pref_alarm_upper_enabled), false)
 
-        alarmView.setAlarms(lowerLimit, upperLimit, true, true)
+        alarmView.setAlarms(lowerLimit, upperLimit, lowerEnabled, upperEnabled)
     }
 
 }

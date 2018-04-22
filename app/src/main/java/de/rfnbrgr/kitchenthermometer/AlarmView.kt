@@ -12,8 +12,8 @@ class AlarmView(context: Context?, attrs: AttributeSet?) : View(context, attrs) 
     private var currentFrame: EnrichedHeatFrame = EnrichedHeatFrame()
     private var lowerLimit: Float = 0f
     private var upperLimit: Float = 100f
-    private var lowerLimitEnabled: Boolean = false
-    private var upperLimitEnabled: Boolean = false
+    private var lowerEnabled: Boolean = false
+    private var upperEnabled: Boolean = false
 
     private var barPaint = Paint()
     private var barBackgroundPaint = Paint()
@@ -41,8 +41,8 @@ class AlarmView(context: Context?, attrs: AttributeSet?) : View(context, attrs) 
     fun setAlarms(lowerLimit: Float, upperLimit: Float, lowerLimitEnabled: Boolean, upperLimitEnabled: Boolean) {
         this.lowerLimit = lowerLimit
         this.upperLimit = upperLimit
-        this.lowerLimitEnabled = lowerLimitEnabled
-        this.upperLimitEnabled = upperLimitEnabled
+        this.lowerEnabled = lowerLimitEnabled
+        this.upperEnabled = upperLimitEnabled
         invalidate()
     }
 
@@ -70,8 +70,12 @@ class AlarmView(context: Context?, attrs: AttributeSet?) : View(context, attrs) 
 
         val lowerMarkerX = temperatureToX(lowerLimit, frame)
         val upperMarkerX = temperatureToX(upperLimit, frame)
-        canvas.drawLine(lowerMarkerX, paddingTop.toFloat(), lowerMarkerX, height - paddingBottom.toFloat(), lowerLimitPaint)
-        canvas.drawLine(upperMarkerX, paddingTop.toFloat(), upperMarkerX, height - paddingBottom.toFloat(), upperLimitPaint)
+        if (lowerEnabled) {
+            canvas.drawLine(lowerMarkerX, paddingTop.toFloat(), lowerMarkerX, height - paddingBottom.toFloat(), lowerLimitPaint)
+        }
+        if (upperEnabled) {
+            canvas.drawLine(upperMarkerX, paddingTop.toFloat(), upperMarkerX, height - paddingBottom.toFloat(), upperLimitPaint)
+        }
     }
 
     private fun temperatureToX(temperature: Float, frame: EnrichedHeatFrame): Float {
