@@ -4,6 +4,7 @@ import android.animation.ArgbEvaluator
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import java.lang.Math.min
 
@@ -18,6 +19,7 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
 
     private val bitmapPaintPixels = Paint()
     private val bitmapPaintPixelsSmooth = Paint()
+    private val markerPaint = Paint()
     private var bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     private var bitmapRect = Rect(0, 0, bitmap.width, bitmap.height)
     private var drawingRect = Rect(0, 0, 0, 0)
@@ -30,6 +32,9 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
         bitmapPaintPixelsSmooth.isAntiAlias = false
         bitmapPaintPixelsSmooth.isDither = false
         bitmapPaintPixelsSmooth.isFilterBitmap = true
+        markerPaint.color = Color.WHITE
+        markerPaint.style = Paint.Style.STROKE
+        markerPaint.strokeWidth = 5f
     }
 
     fun setFrame(newFrame: EnrichedHeatFrame) {
@@ -52,6 +57,7 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
         createBitmap()
         setBitmapPixels(currentFrame)
         drawBitmapWithColors(canvas, bitmap)
+        drawMinMaxTemperatureMarkers(canvas, currentFrame)
     }
 
     private fun createBitmap() {
@@ -87,6 +93,18 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
         val rect = Rect(0, 0, bitmap.width, bitmap.height)
         val paint = if (smooth) bitmapPaintPixelsSmooth else bitmapPaintPixels
         canvas?.drawBitmap(bitmap, rect, drawingRect, paint)
+    }
+
+    private fun drawMinMaxTemperatureMarkers(canvas: Canvas?, frame: EnrichedHeatFrame) {
+        drawMarker(canvas, frame, frame.minPosition)
+        drawMarker(canvas, frame, frame.maxPosition)
+    }
+
+    private fun drawMarker(canvas: Canvas?, frame: EnrichedHeatFrame, position: Pair<Int, Int>) {
+        val cx = (position.first.toFloat() + 0.5f) / frame.width * drawingRect.width() + drawingRect.left
+        val cy = (position.second.toFloat() + 0.5f) / frame.height * drawingRect.height() + drawingRect.top
+        val r = min(drawingRect.height(), drawingRect.width()) * 0.02f
+        canvas?.drawCircle(cx, cy, r, markerPaint)
     }
 
     private fun calculateScaleAndOffset() {
