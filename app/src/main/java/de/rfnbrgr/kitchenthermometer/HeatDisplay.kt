@@ -130,8 +130,17 @@ class HeatDisplay : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCha
             getString(R.string.pref_temperature_scale_value_fixed) -> TemperatureScale.FIXED
             else -> TemperatureScale.AUTO
         }
-        val fixedTemperatureRangeMin = sharedPref.getString(getString(R.string.pref_temperature_range_min), "0").toFloat()
-        val fixedTemperatureRangeMax = sharedPref.getString(getString(R.string.pref_temperature_range_max), "100").toFloat()
+        val fixedTemperatureRangeMin = getFloatPreference(R.string.pref_temperature_range_min)
+        val fixedTemperatureRangeMax = getFloatPreference(R.string.pref_temperature_range_max)
         heatmap.fixedTemperatureRange = Pair(fixedTemperatureRangeMin, fixedTemperatureRangeMax)
+    }
+
+    private fun getFloatPreference(key: Int): Float {
+        val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+        return try {
+            sharedPref.getString(getString(key), "0").toFloat()
+        } catch (e: NumberFormatException) {
+            0f
+        }
     }
 }
