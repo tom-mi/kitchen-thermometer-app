@@ -53,4 +53,11 @@
         android:layout_height="wrap_content"
         android:layout_weight="0" />
 
+    <fragment
+        android:id="@+id/fragment2"
+        android:name="de.rfnbrgr.kitchenthermometer.AlarmFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0" />
+
 </LinearLayout>
