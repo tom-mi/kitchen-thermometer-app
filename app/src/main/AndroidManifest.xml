@@ -18,6 +18,9 @@
             </intent-filter>
         </activity>
         <activity android:name="de.rfnbrgr.kitchenthermometer.SettingsActivity" />
+        <activity
+            android:name=".AlarmSettingsActivity"
+            android:theme="@style/AppTheme.SettingsTheme" />
 
         <service android:name="de.rfnbrgr.kitchenthermometer.DeviceClientService" />
     </application>

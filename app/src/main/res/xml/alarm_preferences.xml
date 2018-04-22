@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:asp="http://schemas.android.com/apk/res-auto">
+
+    <SeekBarPreference
+        android:defaultValue="10"
+        android:key="@string/pref_alarm_lower_limit"
+        android:title="@string/pref_alarm_lower_limit_title"
+        asp:min="0" />
+    <SeekBarPreference
+        android:defaultValue="40"
+        android:key="@string/pref_alarm_upper_limit"
+        android:title="@string/pref_alarm_upper_limit_title"
+        asp:min="0" />
+</android.support.v7.preference.PreferenceScreen>
