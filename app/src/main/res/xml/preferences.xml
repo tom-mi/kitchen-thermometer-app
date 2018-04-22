@@ -15,14 +15,38 @@
     <PreferenceCategory
         android:key="pref_heatmap"
         android:title="@string/pref_heatmap_title">
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="@string/pref_interpolate_heatmap"
-        android:title="@string/pref_interpolate_heatmap_title" />
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="@string/pref_smooth_heatmap"
-        android:title="@string/pref_smooth_heatmap_title" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_interpolate_heatmap"
+            android:title="@string/pref_interpolate_heatmap_title" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_smooth_heatmap"
+            android:title="@string/pref_smooth_heatmap_title" />
+        <ListPreference
+            android:defaultValue="@string/pref_temperature_scale_value_auto"
+            android:dialogTitle="@string/pref_temperature_scaling_title"
+            android:entries="@array/pref_temperature_scale_entries"
+            android:entryValues="@array/pref_temperature_scale_values"
+            android:key="@string/pref_temperature_scale"
+            android:title="@string/pref_temperature_scaling_title"
+            android:summary="%s"
+            />
+        <de.rfnbrgr.kitchenthermometer.BetterEditTextPreference
+            android:inputType="numberDecimal"
+            android:defaultValue="0"
+            android:key="@string/pref_temperature_range_min"
+            android:maxLines="1"
+            android:summary="%s"
+            android:title="@string/pref_temperature_range_min_title" />
+        <de.rfnbrgr.kitchenthermometer.BetterEditTextPreference
+            android:dependency=""
+            android:inputType="numberDecimal"
+            android:defaultValue="100"
+            android:key="@string/pref_temperature_range_max"
+            android:maxLines="1"
+            android:summary="%s"
+            android:title="@string/pref_temperature_range_max_title" />
     </PreferenceCategory>
 
 </PreferenceScreen>

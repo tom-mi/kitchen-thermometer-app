@@ -17,11 +17,11 @@ HEIGHT = 8
 
 def main():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((TCP_IP, TCP_PORT))
     s.listen(1)
 
     while 1:
-
         conn, addr = s.accept()
         print('Connection address:', addr)
 
@@ -31,7 +31,9 @@ def main():
             break
 
 
-    conn.close()
+    print('Shutting down socket')
+    s.shutdown(socket.SHUT_RDWR)
+    s.close()
 
 
 def handle(conn):
@@ -44,10 +46,12 @@ def handle(conn):
                 'width': WIDTH,
                 'height': HEIGHT,
                 'temperatures': pixels,
+                'temperatureRangeMin': 0.,
+                'temperatureRangeMax': 100.,
             }
             conn.send(json.dumps(data).encode() + b'\n')
             print('sending data')
-            time.sleep(0.5)
+            time.sleep(1)
         except socket.error as e:
             print('Socket error', e)
             break
@@ -57,7 +61,7 @@ def handle(conn):
 def randomize(pixels):
     for i in range(len(pixels)):
         pixels[i] += (random.random() - 0.5) * 10
-        pixels[i] = max(0, min(100., pixels[i]))
+        pixels[i] = max(0, min(50., pixels[i]))
 
 
 

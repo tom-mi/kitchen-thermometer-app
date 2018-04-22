@@ -59,7 +59,7 @@ class DeviceClient(private val host: String, private val port: Int,
             val reader = BufferedReader(InputStreamReader(client.getInputStream()))
             while (running.get()) {
                 try {
-                    val line = reader.readLine() ?: continue
+                    val line = reader.readLine() ?: break
                     val frame = deserialize(line)
                     if (frame != null) {
                         frameCallback(frame)

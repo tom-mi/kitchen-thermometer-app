@@ -72,7 +72,12 @@ class HeatDisplay : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCha
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         Log.d(javaClass.simpleName, "Preference for key $key changed")
-        if (key == getString(R.string.pref_smooth_heatmap)) {
+        if (
+                key == getString(R.string.pref_smooth_heatmap) ||
+                key == getString(R.string.pref_temperature_scale) ||
+                key == getString(R.string.pref_temperature_range_min) ||
+                key == getString(R.string.pref_temperature_range_max)
+        ) {
             configureHeatmap()
         }
     }
@@ -116,7 +121,17 @@ class HeatDisplay : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCha
 
     private fun configureHeatmap() {
         val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
-        heatmap.colorStops = mapOf(0f to Color.BLUE, 20f to Color.GREEN, 50f to Color.YELLOW, 100f to Color.RED)
+        heatmap.colorStops = mapOf(0f to Color.BLUE, 0.25f to Color.GREEN, 0.5f to Color.YELLOW, 1f to Color.RED)
         heatmap.smooth = sharedPref.getBoolean(getString(R.string.pref_smooth_heatmap), false)
+        heatmap.temperatureScale = when (sharedPref.getString(getString(R.string.pref_temperature_scale),
+                getString(R.string.pref_temperature_scale_value_auto))) {
+            getString(R.string.pref_temperature_scale_value_auto) -> TemperatureScale.AUTO
+            getString(R.string.pref_temperature_scale_value_full) -> TemperatureScale.FULL
+            getString(R.string.pref_temperature_scale_value_fixed) -> TemperatureScale.FIXED
+            else -> TemperatureScale.AUTO
+        }
+        val fixedTemperatureRangeMin = sharedPref.getString(getString(R.string.pref_temperature_range_min), "0").toFloat()
+        val fixedTemperatureRangeMax = sharedPref.getString(getString(R.string.pref_temperature_range_max), "100").toFloat()
+        heatmap.fixedTemperatureRange = Pair(fixedTemperatureRangeMin, fixedTemperatureRangeMax)
     }
 }

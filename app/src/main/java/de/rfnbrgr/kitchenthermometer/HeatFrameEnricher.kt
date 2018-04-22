@@ -1,6 +1,5 @@
 package de.rfnbrgr.kitchenthermometer
 
-import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolatingFunction
 import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolator
 import java.lang.Math.max
 import java.lang.Math.min
@@ -37,8 +36,8 @@ fun enrichHeatFrameWithoutInterpolation(frame: HeatFrame): EnrichedHeatFrame {
         }
     }
 
-    return EnrichedHeatFrame(frame.battery, frame.width, frame.height, temperatures2d,
-            minTemperature, maxTemperature, minPosition, maxPosition)
+    return EnrichedHeatFrame(frame.battery, frame.width, frame.height, Pair(frame.temperatureRangeMin, frame.temperatureRangeMax),
+            temperatures2d, minTemperature, maxTemperature, minPosition, maxPosition)
 }
 
 private fun enrichHeatFrameWithInterpolation(frame: HeatFrame): EnrichedHeatFrame {
@@ -77,6 +76,6 @@ private fun enrichHeatFrameWithInterpolation(frame: HeatFrame): EnrichedHeatFram
 
     return EnrichedHeatFrame(frame.battery,
             frame.width * INTERPOLATE_PIXEL_MULTIPLIER, frame.height * INTERPOLATE_PIXEL_MULTIPLIER,
-            temperatures2d,
-            minTemperature, maxTemperature, minPosition, maxPosition)
+            Pair(frame.temperatureRangeMin, frame.temperatureRangeMax),
+            temperatures2d, minTemperature, maxTemperature, minPosition, maxPosition)
 }

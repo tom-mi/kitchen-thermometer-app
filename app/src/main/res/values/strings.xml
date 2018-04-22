@@ -21,4 +21,13 @@
     <string name="state_failed">Failed to connect to %s</string>
     <string name="pref_connection_title">Connection</string>
     <string name="pref_heatmap_title">Heatmap</string>
+    <string name="pref_temperature_scale">temperature_scaling</string>
+    <string name="pref_temperature_scaling_title">Temperature Scale</string>
+    <string name="pref_temperature_scale_value_auto">auto</string>
+    <string name="pref_temperature_scale_value_full">full</string>
+    <string name="pref_temperature_scale_value_fixed">fixed</string>
+    <string name="pref_temperature_range_min">temperature_range_min</string>
+    <string name="pref_temperature_range_min_title">Minimum Temperature</string>
+    <string name="pref_temperature_range_max">temperature_range_max</string>
+    <string name="pref_temperature_range_max_title">Maximum Temperature</string>
 </resources>

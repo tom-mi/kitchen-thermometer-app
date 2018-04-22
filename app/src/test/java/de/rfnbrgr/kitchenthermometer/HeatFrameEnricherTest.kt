@@ -9,10 +9,11 @@ class HeatFrameEnricherTest {
         val BATTERY = 0.7f
         val SMALL_WIDTH = 3
         val SMALL_HEIGHT = 2
-        val SMALL_FRAME = HeatFrame(BATTERY, SMALL_WIDTH, SMALL_HEIGHT, listOf(2f, 1f, 2f, 3f, 4f, 5f))
+        val RANGE = Pair(0f, 100f)
+        val SMALL_FRAME = HeatFrame(BATTERY, SMALL_WIDTH, SMALL_HEIGHT, RANGE.first, RANGE.second, listOf(2f, 1f, 2f, 3f, 4f, 5f))
         val WIDTH = 5
         val HEIGHT = 6
-        val FRAME = HeatFrame(BATTERY, WIDTH, HEIGHT,
+        val FRAME = HeatFrame(BATTERY, WIDTH, HEIGHT, RANGE.first, RANGE.second,
                 listOf(
                         0f, 0f, 1f, 1f, 0f,
                         0f, 0f, 1f, 1f, 0f,
@@ -21,7 +22,7 @@ class HeatFrameEnricherTest {
                         0f, -1f, 0f, 3f, 0f,
                         0f, 0f, 0f, 0f, 0f
                 ))
-        val MAX_FRAME = HeatFrame(BATTERY, 5, 5,
+        val MAX_FRAME = HeatFrame(BATTERY, 5, 5, RANGE.first, RANGE.second,
                 listOf(
                         0f, 0f, 0f, 0f, 0f,
                         0f, 0f, 0f, 0f, 0f,
@@ -29,7 +30,7 @@ class HeatFrameEnricherTest {
                         0f, 0f, 0f, 0f, 0f,
                         0f, 0f, 0f, 0f, 0f
                 ))
-        val MIN_FRAME = HeatFrame(BATTERY, 5, 5,
+        val MIN_FRAME = HeatFrame(BATTERY, 5, 5, RANGE.first, RANGE.second,
                 listOf(
                         0f, 0f, 0f, 0f, 0f,
                         0f, 0f, 0f, 0f, 0f,
@@ -55,6 +56,7 @@ class HeatFrameEnricherTest {
         assertEquals(WIDTH , result.temperatures.size)
         assertEquals(HEIGHT, result.temperatures.first().size)
         assertEquals(HEIGHT, result.temperatures.last().size)
+        assertEquals(RANGE, result.temperatureRange)
         assertEquals(2f, result.temperatures[0][2])
         assertEquals(Pair(1, 4), result.minPosition)
         assertEquals(Pair(3, 4), result.maxPosition)
@@ -71,6 +73,7 @@ class HeatFrameEnricherTest {
         assertEquals(SMALL_WIDTH , result.width)
         assertEquals(SMALL_HEIGHT , result.height)
         assertEquals(SMALL_WIDTH, result.temperatures.size)
+        assertEquals(RANGE, result.temperatureRange)
         assertEquals(SMALL_HEIGHT, result.temperatures.first().size)
         assertEquals(SMALL_HEIGHT, result.temperatures.last().size)
         assertEquals(3f, result.temperatures[0][1])
@@ -87,6 +90,7 @@ class HeatFrameEnricherTest {
         assertEquals(BATTERY, result.battery)
         assertEquals(WIDTH * SCALE, result.width)
         assertEquals(HEIGHT  * SCALE, result.height)
+        assertEquals(RANGE, result.temperatureRange)
         assertEquals(WIDTH  * SCALE, result.temperatures.size)
         assertEquals(HEIGHT * SCALE, result.temperatures.first().size)
         assertEquals(HEIGHT * SCALE, result.temperatures.last().size)

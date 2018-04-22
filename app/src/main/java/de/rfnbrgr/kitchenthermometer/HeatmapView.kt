@@ -9,10 +9,12 @@ import java.lang.Math.min
 
 class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
-    private var frame: EnrichedHeatFrame = EnrichedHeatFrame()
+    private var currentFrame: EnrichedHeatFrame = EnrichedHeatFrame()
 
     var colorStops: Map<Float, Int> = mapOf(0f to Color.BLACK, 1f to Color.WHITE)
     var smooth: Boolean = false
+    var temperatureScale: TemperatureScale = TemperatureScale.AUTO
+    var fixedTemperatureRange: Pair<Float, Float> = Pair(0f, 100f)
 
     private val bitmapPaintPixels = Paint()
     private val bitmapPaintPixelsSmooth = Paint()
@@ -31,7 +33,7 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
     }
 
     fun setFrame(newFrame: EnrichedHeatFrame) {
-        frame = newFrame
+        currentFrame = newFrame
         calculateScaleAndOffset()
         invalidate()
     }
@@ -43,18 +45,18 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        if (frame.height * frame.width == 0) {
+        if (currentFrame.height * currentFrame.width == 0) {
             return
         }
 
         createBitmap()
-        setBitmapPixels(frame)
+        setBitmapPixels(currentFrame)
         drawBitmapWithColors(canvas, bitmap)
     }
 
     private fun createBitmap() {
-        if (frame.width != bitmap.width || frame.height != bitmap.height) {
-            bitmap = Bitmap.createBitmap(frame.width, frame.height, Bitmap.Config.ARGB_8888)
+        if (currentFrame.width != bitmap.width || currentFrame.height != bitmap.height) {
+            bitmap = Bitmap.createBitmap(currentFrame.width, currentFrame.height, Bitmap.Config.ARGB_8888)
             bitmapRect = Rect(0, 0, bitmap.width, bitmap.height)
         }
     }
@@ -62,10 +64,23 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
     private fun setBitmapPixels(frame: EnrichedHeatFrame) {
         for (x in 0..(frame.width - 1)) {
             for (y in 0..(frame.height - 1)) {
-                val color = interpolate(colorStops, frame.temperatures[x][y])
+                val color = interpolateWithScale(frame, frame.temperatures[x][y])
                 bitmap.setPixel(x, y, color)
             }
         }
+    }
+
+    private fun interpolateWithScale(frame: EnrichedHeatFrame, temperature: Float): Int {
+        val normalizedValue = when (temperatureScale) {
+            TemperatureScale.AUTO -> scale(frame.minTemperature, frame.maxTemperature, temperature)
+            TemperatureScale.FULL -> scale(frame.temperatureRange.first, frame.temperatureRange.second, temperature)
+            TemperatureScale.FIXED -> scale(fixedTemperatureRange.first, fixedTemperatureRange.second, temperature)
+        }
+        return interpolate(colorStops, normalizedValue)
+    }
+
+    private fun scale(minValue: Float, maxValue: Float, value: Float): Float {
+        return (value - minValue) / (maxValue - minValue)
     }
 
     private fun drawBitmapWithColors(canvas: Canvas?, bitmap: Bitmap) {
@@ -75,9 +90,9 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
     }
 
     private fun calculateScaleAndOffset() {
-        val scale = min(width.toFloat() / frame.width, height.toFloat() / frame.height)
-        val dx = (width - (frame.width * scale)).toInt() / 2
-        val dy = (height - (frame.height * scale)).toInt() / 2
+        val scale = min(width.toFloat() / currentFrame.width, height.toFloat() / currentFrame.height)
+        val dx = (width - (currentFrame.width * scale)).toInt() / 2
+        val dy = (height - (currentFrame.height * scale)).toInt() / 2
 
         drawingRect = Rect(dx, dy, width - dx, height - dy)
     }

@@ -39,37 +39,3 @@ class TestDevice(val port: Int) : Runnable {
         }
     }
 }
-
-fun main(args: Array<String>) {
-    val width = 8
-    val height = 8
-    val pixels: MutableList<Float> = (1..width * height).map { 0f }.toMutableList()
-
-    val random = Random()
-    val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-    val heatFrameAdapter = moshi.adapter<HeatFrame>(HeatFrame::class.java)
-
-    val device = TestDevice(5000)
-    val deviceThread = Thread(device)
-    deviceThread.start()
-
-    while (true) {
-        for (i in 0..pixels.size) {
-            pixels[i] = pixels[i] + random.nextFloat()
-            pixels[i] = maxOf(0f, minOf(100f, pixels[i]))
-        }
-
-        try {
-            val frame = HeatFrame(0.7f, width, height, pixels)
-            println("Sending frame $frame")
-            device.send(heatFrameAdapter.toJson(frame) + '\n')
-            Thread.sleep(100)
-        } catch (e: InterruptedException) {
-            break
-        }
-    }
-    device.stop()
-    deviceThread.join()
-}
