@@ -8,11 +8,6 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="AppTheme.SettingsTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
-    </style>
-
-
     <style name="Toolbar">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">match_parent</item>
