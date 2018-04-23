@@ -1,6 +1,8 @@
 package de.rfnbrgr.kitchenthermometer
 
 import android.util.Log
+import com.squareup.moshi.JsonDataException
+import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import java.io.BufferedReader
@@ -77,7 +79,15 @@ class DeviceClient(private val host: String, private val port: Int,
     }
 
     private fun deserialize(json: String): HeatFrame? {
-        return heatFrameAdapter.fromJson(json)
+        return try {
+            heatFrameAdapter.fromJson(json)
+        } catch(e: JsonEncodingException ) {
+            Log.w(javaClass.simpleName, "Could not decode Json [$json]", e)
+            null
+        } catch(e: JsonDataException) {
+            Log.w(javaClass.simpleName, "Could not decode Json [$json]", e)
+            null
+        }
     }
 
 }
