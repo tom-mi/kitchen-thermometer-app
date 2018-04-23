@@ -23,6 +23,8 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
     private var bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     private var bitmapRect = Rect(0, 0, bitmap.width, bitmap.height)
     private var drawingRect = Rect(0, 0, 0, 0)
+    private var lastTemperatureMin: Float = fixedTemperatureRange.first
+    private var lastTemperatureMax: Float = fixedTemperatureRange.second
 
 
     init {
@@ -40,6 +42,7 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
     fun setFrame(newFrame: EnrichedHeatFrame) {
         currentFrame = newFrame
         calculateScaleAndOffset()
+        smoothTemperatureMinMax(newFrame)
         invalidate()
     }
 
@@ -78,7 +81,7 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
 
     private fun interpolateWithScale(frame: EnrichedHeatFrame, temperature: Float): Int {
         val normalizedValue = when (temperatureScale) {
-            TemperatureScale.AUTO -> scale(frame.minTemperature, frame.maxTemperature, temperature)
+            TemperatureScale.AUTO -> scale(lastTemperatureMin, lastTemperatureMax, temperature)
             TemperatureScale.FULL -> scale(frame.temperatureRange.first, frame.temperatureRange.second, temperature)
             TemperatureScale.FIXED -> scale(fixedTemperatureRange.first, fixedTemperatureRange.second, temperature)
         }
@@ -113,6 +116,11 @@ class HeatmapView(context: Context?, attrs: AttributeSet?) : View(context, attrs
         val dy = (height - (currentFrame.height * scale)).toInt() / 2
 
         drawingRect = Rect(dx, dy, width - dx, height - dy)
+    }
+
+    private fun smoothTemperatureMinMax(frame: EnrichedHeatFrame) {
+        lastTemperatureMin = lastTemperatureMin * 0.9f + frame.minTemperature * 0.1f
+        lastTemperatureMax = lastTemperatureMax * 0.9f + frame.maxTemperature * 0.1f
     }
 
 }
