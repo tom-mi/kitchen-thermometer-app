@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.media.Ringtone
+import android.media.RingtoneManager
 import android.util.AttributeSet
 import android.view.View
 
@@ -18,14 +20,17 @@ class AlarmView(context: Context?, attrs: AttributeSet?) : View(context, attrs) 
     private var barBackgroundPaint = Paint()
     private var lowerLimitPaint = Paint()
     private var upperLimitPaint = Paint()
+    private var alarmTone: Ringtone
 
     init {
-        barPaint.color = Color.GRAY
+        barPaint.color = Color.BLACK
         barBackgroundPaint.color = Color.LTGRAY
         lowerLimitPaint.color = Color.BLUE
         lowerLimitPaint.strokeWidth = 10f
         upperLimitPaint.color = Color.RED
         upperLimitPaint.strokeWidth = 10f
+        val notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+        alarmTone = RingtoneManager.getRingtone(context, notification)
     }
 
     companion object {
@@ -59,6 +64,16 @@ class AlarmView(context: Context?, attrs: AttributeSet?) : View(context, attrs) 
         val barTop = paddingTop + (BAR_HEIGHT_RELATIVE / 2) * availableHeight
         val barBottom = paddingTop + (1 - BAR_HEIGHT_RELATIVE / 2) * availableHeight
 
+        if (alarmEnabled && upperLimit <= frame.maxTemperature) {
+            canvas.drawColor(0xFFFF8080.toInt())
+            alarmTone.play()
+        } else if (alarmEnabled && frame.maxTemperature <= lowerLimit) {
+            canvas.drawColor(0xFF8080FF.toInt())
+            alarmTone.play()
+        } else {
+            alarmTone.stop()
+        }
+
         canvas.drawRect(
                 temperatureToX(frame.temperatureRange.first, frame), barTop,
                 temperatureToX(frame.temperatureRange.second, frame), barBottom, barBackgroundPaint)
@@ -70,8 +85,6 @@ class AlarmView(context: Context?, attrs: AttributeSet?) : View(context, attrs) 
         val upperMarkerX = temperatureToX(upperLimit, frame)
         if (alarmEnabled) {
             canvas.drawLine(lowerMarkerX, paddingTop.toFloat(), lowerMarkerX, height - paddingBottom.toFloat(), lowerLimitPaint)
-        }
-        if (alarmEnabled) {
             canvas.drawLine(upperMarkerX, paddingTop.toFloat(), upperMarkerX, height - paddingBottom.toFloat(), upperLimitPaint)
         }
     }

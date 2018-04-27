@@ -2,6 +2,8 @@ package de.rfnbrgr.kitchenthermometer
 
 import android.app.Fragment
 import android.content.*
+import android.media.Ringtone
+import android.media.RingtoneManager
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v4.content.LocalBroadcastManager
@@ -33,6 +35,7 @@ class AlarmFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
         super.onCreate(savedInstanceState)
         val sharedPref = PreferenceManager.getDefaultSharedPreferences(this.activity)
         sharedPref.registerOnSharedPreferenceChangeListener(this)
+
     }
 
     override fun onResume() {
