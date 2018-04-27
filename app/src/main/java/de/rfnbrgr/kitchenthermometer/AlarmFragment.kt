@@ -12,7 +12,6 @@ import kotlinx.android.synthetic.main.fragment_alarm.*
 
 class AlarmFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
-
     private var temperatureRange: Pair<Float, Float> = Pair(0f, 100f)
 
     private val receiver = object : BroadcastReceiver() {
@@ -51,6 +50,7 @@ class AlarmFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         if (key in listOf<String>(
+                        getString(R.string.pref_alarm_enabled),
                         getString(R.string.pref_alarm_lower_limit),
                         getString(R.string.pref_alarm_upper_limit))) {
             configureAlarmView()
@@ -61,10 +61,9 @@ class AlarmFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
         val sharedPref = PreferenceManager.getDefaultSharedPreferences(this.activity)
         val lowerLimit = getFloatPreference(this.activity, getString(R.string.pref_alarm_lower_limit))
         val upperLimit = getFloatPreference(this.activity, getString(R.string.pref_alarm_upper_limit))
-        val lowerEnabled = sharedPref.getBoolean(getString(R.string.pref_alarm_lower_enabled), false)
-        val upperEnabled = sharedPref.getBoolean(getString(R.string.pref_alarm_upper_enabled), false)
+        val alarmEnabled = sharedPref.getBoolean(getString(R.string.pref_alarm_enabled), false)
 
-        alarmView.setAlarms(lowerLimit, upperLimit, lowerEnabled, upperEnabled)
+        alarmView.setAlarms(lowerLimit, upperLimit, alarmEnabled)
     }
 
 }

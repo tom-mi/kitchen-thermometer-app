@@ -12,8 +12,7 @@ class AlarmView(context: Context?, attrs: AttributeSet?) : View(context, attrs) 
     private var currentFrame: EnrichedHeatFrame = EnrichedHeatFrame()
     private var lowerLimit: Float = 0f
     private var upperLimit: Float = 100f
-    private var lowerEnabled: Boolean = false
-    private var upperEnabled: Boolean = false
+    private var alarmEnabled: Boolean = false
 
     private var barPaint = Paint()
     private var barBackgroundPaint = Paint()
@@ -24,9 +23,9 @@ class AlarmView(context: Context?, attrs: AttributeSet?) : View(context, attrs) 
         barPaint.color = Color.GRAY
         barBackgroundPaint.color = Color.LTGRAY
         lowerLimitPaint.color = Color.BLUE
-        lowerLimitPaint.strokeWidth = 5f
+        lowerLimitPaint.strokeWidth = 10f
         upperLimitPaint.color = Color.RED
-        upperLimitPaint.strokeWidth = 5f
+        upperLimitPaint.strokeWidth = 10f
     }
 
     companion object {
@@ -38,11 +37,10 @@ class AlarmView(context: Context?, attrs: AttributeSet?) : View(context, attrs) 
         invalidate()
     }
 
-    fun setAlarms(lowerLimit: Float, upperLimit: Float, lowerLimitEnabled: Boolean, upperLimitEnabled: Boolean) {
+    fun setAlarms(lowerLimit: Float, upperLimit: Float, alarmEnabled: Boolean) {
         this.lowerLimit = lowerLimit
         this.upperLimit = upperLimit
-        this.lowerEnabled = lowerLimitEnabled
-        this.upperEnabled = upperLimitEnabled
+        this.alarmEnabled = alarmEnabled
         invalidate()
     }
 
@@ -70,10 +68,10 @@ class AlarmView(context: Context?, attrs: AttributeSet?) : View(context, attrs) 
 
         val lowerMarkerX = temperatureToX(lowerLimit, frame)
         val upperMarkerX = temperatureToX(upperLimit, frame)
-        if (lowerEnabled) {
+        if (alarmEnabled) {
             canvas.drawLine(lowerMarkerX, paddingTop.toFloat(), lowerMarkerX, height - paddingBottom.toFloat(), lowerLimitPaint)
         }
-        if (upperEnabled) {
+        if (alarmEnabled) {
             canvas.drawLine(upperMarkerX, paddingTop.toFloat(), upperMarkerX, height - paddingBottom.toFloat(), upperLimitPaint)
         }
     }

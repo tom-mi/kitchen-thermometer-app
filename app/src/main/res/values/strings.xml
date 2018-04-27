@@ -38,8 +38,6 @@
     <string name="pref_alarm_lower_limit_title">Cooling Down Alarm Threshold</string>
     <string name="pref_alarm_upper_limit">alarm_upper_limit</string>
     <string name="pref_alarm_upper_limit_title">Heating Up Alarm Threshold</string>
-    <string name="pref_alarm_lower_enabled">alarm_lower_enabled</string>
-    <string name="pref_alarm_lower_enabled_title">Cooling Down Alarm</string>
-    <string name="pref_alarm_upper_enabled">alarm_upper_enabled</string>
-    <string name="pref_alarm_upper_enabled_title">Heating Up Alarm</string>
+    <string name="pref_alarm_enabled">alarm_enabled</string>
+    <string name="pref_alarm_enabled_title">Temperature Alarm</string>
 </resources>

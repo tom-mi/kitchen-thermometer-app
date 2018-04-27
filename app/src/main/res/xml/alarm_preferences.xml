@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <SwitchPreference
-        android:key="@string/pref_alarm_lower_enabled"
-        android:title="@string/pref_alarm_lower_enabled_title" />
+        android:key="@string/pref_alarm_enabled"
+        android:title="@string/pref_alarm_enabled_title" />
     <de.rfnbrgr.kitchenthermometer.BetterEditTextPreference
         android:defaultValue="10"
-        android:dependency="@string/pref_alarm_lower_enabled"
+        android:dependency="@string/pref_alarm_enabled"
         android:inputType="numberDecimal"
         android:key="@string/pref_alarm_lower_limit"
         android:maxLines="1"
         android:summary="@string/celsius_temperature_summary"
         android:title="@string/pref_alarm_lower_limit_title" />
-    <SwitchPreference
-        android:key="@string/pref_alarm_upper_enabled"
-        android:title="@string/pref_alarm_upper_enabled_title" />
     <de.rfnbrgr.kitchenthermometer.BetterEditTextPreference
         android:defaultValue="40"
-        android:dependency="@string/pref_alarm_upper_enabled"
+        android:dependency="@string/pref_alarm_enabled"
         android:inputType="numberDecimal"
         android:key="@string/pref_alarm_upper_limit"
         android:maxLines="1"
