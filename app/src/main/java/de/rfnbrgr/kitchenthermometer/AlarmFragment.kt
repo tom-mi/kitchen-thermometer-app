@@ -5,6 +5,7 @@ import android.content.*
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v4.content.LocalBroadcastManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,6 +41,11 @@ class AlarmFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
         editAlarmsButton.setOnClickListener {
             startActivity(Intent(this.activity, AlarmSettingsActivity::class.java))
         }
+        toggleAlarmButton.setOnCheckedChangeListener { _, isChecked ->
+            val sharedPref = PreferenceManager.getDefaultSharedPreferences(this.activity)
+            Log.d(javaClass.simpleName, "Setting alarmEnabled=$isChecked due to toggle")
+            sharedPref.edit().putBoolean(getString(R.string.pref_alarm_enabled), isChecked).apply()
+        }
         LocalBroadcastManager.getInstance(activity).registerReceiver(receiver, IntentFilter(HEAT_FRAME_ACTION))
     }
 
@@ -64,6 +70,7 @@ class AlarmFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
         val alarmEnabled = sharedPref.getBoolean(getString(R.string.pref_alarm_enabled), false)
 
         alarmView.setAlarms(lowerLimit, upperLimit, alarmEnabled)
+        toggleAlarmButton.isChecked = alarmEnabled
     }
 
 }

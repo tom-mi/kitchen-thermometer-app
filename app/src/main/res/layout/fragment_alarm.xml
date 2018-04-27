@@ -13,6 +13,15 @@
         android:layout_weight="1"
         android:padding="8dp" />
 
+    <ToggleButton
+        android:id="@+id/toggleAlarmButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_weight="0"
+        android:background="@drawable/ic_alarm_toggle"
+        android:textOff=""
+        android:textOn="" />
+
     <ImageButton
         android:id="@+id/editAlarmsButton"
         android:layout_width="50dp"
@@ -20,5 +29,6 @@
         android:layout_weight="0"
         android:contentDescription="@string/edit_alarms"
         android:padding="8dp"
+        android:background="@android:color/transparent"
         app:srcCompat="@drawable/ic_edit_black_24dp" />
 </LinearLayout>
