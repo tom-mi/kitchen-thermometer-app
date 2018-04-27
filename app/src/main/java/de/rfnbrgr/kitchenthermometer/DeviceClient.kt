@@ -64,6 +64,7 @@ class DeviceClient(private val host: String, private val port: Int,
                     val line = reader.readLine() ?: break
                     val frame = deserialize(line)
                     if (frame != null) {
+                        Log.d(javaClass.simpleName, "${Thread.currentThread().name}: >>>> frame >>>>>")
                         frameCallback(frame)
                     }
                 } catch (e: SocketTimeoutException) {

@@ -3,6 +3,7 @@ package de.rfnbrgr.kitchenthermometer
 import android.app.Service
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Binder
 import android.os.IBinder
 import android.preference.PreferenceManager
 import android.support.v4.content.LocalBroadcastManager
@@ -25,7 +26,11 @@ class DeviceClientService : Service() {
     private var preferencesListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
 
     private var currentHostname: String = ""
-    @Volatile private var interpolate: Boolean = false
+
+    @Volatile
+    private var interpolate: Boolean = false
+
+    private var isBound: Boolean = false
 
     override fun onCreate() {
         preferencesListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
@@ -39,26 +44,39 @@ class DeviceClientService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        return null
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d(javaClass.simpleName, "${Thread.currentThread().name}: Starting service")
+        Log.d(javaClass.simpleName, "${Thread.currentThread().name}: Binding service")
+        isBound = true
         val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
         sharedPref.registerOnSharedPreferenceChangeListener(preferencesListener)
         configureInterpolation()
-        restartDeviceClientThread()
 
-        return START_STICKY  // TODO is that correct?
+        restartDeviceClientThread()
+        return DeviceClientServiceBinder()
+    }
+
+    inner class DeviceClientServiceBinder : Binder() {
+        fun getService(): DeviceClientService {
+            return this@DeviceClientService
+        }
+    }
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        Log.d(javaClass.simpleName, "${Thread.currentThread().name}: Unbinding service")
+        isBound = false
+        val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+        sharedPref.unregisterOnSharedPreferenceChangeListener(preferencesListener)
+        stopDeviceClientThread()
+        return super.onUnbind(intent)
     }
 
     override fun onDestroy() {
-        super.onDestroy()
+        Log.d(javaClass.simpleName, "${Thread.currentThread().name}: Destroying service")
         val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
         sharedPref.unregisterOnSharedPreferenceChangeListener(preferencesListener)
         stopDeviceClientThread()
     }
 
+    @Synchronized
     private fun startDeviceClientThread() {
         val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
         currentHostname = sharedPref.getString(getString(R.string.pref_hostname), "")
@@ -69,6 +87,7 @@ class DeviceClientService : Service() {
         deviceClientThread!!.start()
     }
 
+    @Synchronized
     private fun stopDeviceClientThread() {
         Log.d(javaClass.simpleName, "Stopping device client ${deviceClientThread?.name}")
         deviceClient?.stop()
@@ -76,9 +95,15 @@ class DeviceClientService : Service() {
         Log.d(javaClass.simpleName, "Stopped device client: ${deviceClientThread?.isAlive}")
     }
 
-    @Synchronized private fun restartDeviceClientThread() {
-        stopDeviceClientThread()
-        startDeviceClientThread()
+    @Synchronized
+    fun restartDeviceClientThread() {
+        if (isBound) {
+            Log.d(javaClass.simpleName, "${Thread.currentThread().name}: Restarting device client")
+            stopDeviceClientThread()
+            startDeviceClientThread()
+        } else {
+            Log.w(javaClass.simpleName, "${Thread.currentThread().name}: Ignoring restart call as service is not bound")
+        }
     }
 
     private fun configureInterpolation() {

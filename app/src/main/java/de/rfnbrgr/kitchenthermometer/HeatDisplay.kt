@@ -3,6 +3,7 @@ package de.rfnbrgr.kitchenthermometer
 import android.content.*
 import android.graphics.Color
 import android.os.Bundle
+import android.os.IBinder
 import android.preference.PreferenceManager
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
@@ -34,6 +35,18 @@ class HeatDisplay : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCha
         }
     }
 
+    private var clientService: DeviceClientService? = null
+
+    private var serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            clientService = (service as DeviceClientService.DeviceClientServiceBinder).getService()
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            clientService = null
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toolbar_menu, menu)
         return true
@@ -61,7 +74,7 @@ class HeatDisplay : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCha
         }
 
         R.id.action_reconnect -> {
-            startService(Intent(this, DeviceClientService::class.java))
+            clientService?.restartDeviceClientThread()
             true
         }
 
@@ -90,13 +103,14 @@ class HeatDisplay : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCha
         filter.addAction(CLIENT_STATE_ACTION)
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter)
 
-        startService(Intent(this, DeviceClientService::class.java))
+        bindService(Intent(this, DeviceClientService::class.java), serviceConnection,
+                Context.BIND_AUTO_CREATE)
     }
 
     override fun onStop() {
         super.onStop()
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
-        stopService(Intent(this, DeviceClientService::class.java))
+        unbindService(serviceConnection)
     }
 
     override fun onResume() {
@@ -105,6 +119,8 @@ class HeatDisplay : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCha
         val hostname = sharedPref.getString(getString(R.string.pref_hostname), "")
         if (hostname == "") {
             showSetHostnameDialog()
+        } else {
+            clientService?.restartDeviceClientThread()
         }
     }
 
