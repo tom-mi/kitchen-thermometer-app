@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_weight="0"
+    android:gravity="center_vertical"
     android:orientation="horizontal">
 
     <TextView
@@ -11,10 +12,11 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
         android:layout_weight="1"
         android:text="@string/nan_temperature"
-        android:textSize="40sp" />
+        android:textSize="50sp" />
 
     <TextView
         android:id="@+id/textMinTemperature"
@@ -22,9 +24,11 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
         android:layout_weight="1"
         android:text="@string/nan_temperature"
+        android:textAlignment="textEnd"
         android:textColor="#4040F0"
-        android:textSize="20sp" />
+        android:textSize="30sp" />
 </LinearLayout>
