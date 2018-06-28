@@ -36,7 +36,7 @@ fun enrichHeatFrameWithoutInterpolation(frame: HeatFrame): EnrichedHeatFrame {
         }
     }
 
-    return EnrichedHeatFrame(frame.battery, frame.width, frame.height, Pair(frame.temperatureRangeMin, frame.temperatureRangeMax),
+    return EnrichedHeatFrame(frame.battery, frame.batteryVoltage, frame.width, frame.height, Pair(frame.temperatureRangeMin, frame.temperatureRangeMax),
             temperatures2d, minTemperature, maxTemperature, minPosition, maxPosition)
 }
 
@@ -74,7 +74,7 @@ private fun enrichHeatFrameWithInterpolation(frame: HeatFrame): EnrichedHeatFram
         }
     }
 
-    return EnrichedHeatFrame(frame.battery,
+    return EnrichedHeatFrame(frame.battery, frame.batteryVoltage,
             frame.width * INTERPOLATE_PIXEL_MULTIPLIER, frame.height * INTERPOLATE_PIXEL_MULTIPLIER,
             Pair(frame.temperatureRangeMin, frame.temperatureRangeMax),
             temperatures2d, minTemperature, maxTemperature, minPosition, maxPosition)

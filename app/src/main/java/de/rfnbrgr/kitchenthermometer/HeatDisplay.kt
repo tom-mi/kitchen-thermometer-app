@@ -20,6 +20,7 @@ class HeatDisplay : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCha
             if (intent?.action == HEAT_FRAME_ACTION) {
                 val frame = intent.getParcelableExtra<EnrichedHeatFrame>(HEAT_FRAME_PAYLOAD)
                 heatmap.setFrame(frame)
+                setBatteryStatus(frame)
             }
             if (intent?.action == CLIENT_STATE_ACTION) {
                 val state = intent.getSerializableExtra(CLIENT_STATE_PAYLOAD) as DeviceClient.ClientState
@@ -150,6 +151,10 @@ class HeatDisplay : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCha
         val fixedTemperatureRangeMin = getFloatPreference(this, getString(R.string.pref_temperature_range_min))
         val fixedTemperatureRangeMax = getFloatPreference(this, getString(R.string.pref_temperature_range_max))
         heatmap.fixedTemperatureRange = Pair(fixedTemperatureRangeMin, fixedTemperatureRangeMax)
+    }
+
+    private fun setBatteryStatus(frame: EnrichedHeatFrame) {
+        textBatteryStatus.text = String.format(getString(R.string.battery_template), frame.battery * 100f, frame.batteryVoltage)
     }
 
 }

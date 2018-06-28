@@ -8,6 +8,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class EnrichedHeatFrame(
         val battery: Float = 0f,
+        val batteryVoltage: Float = 0f,
         val width: Int = 0,
         val height: Int = 0,
         val temperatureRange: Pair<Float, Float> = Pair(0f, 1f),

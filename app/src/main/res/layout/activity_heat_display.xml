@@ -32,6 +32,16 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@string/state_unknown" />
 
+    <TextView
+        android:id="@+id/textBatteryStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="0"
+        tools:text="@string/battery_unknown" />
+
     <de.rfnbrgr.kitchenthermometer.HeatmapView
         android:id="@+id/heatmap"
         android:layout_width="match_parent"
