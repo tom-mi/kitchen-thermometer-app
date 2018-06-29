@@ -43,6 +43,7 @@ def handle(conn):
             randomize(pixels)
             data = {
                 'battery': 0.5,
+                'batteryVoltage': 3.9,
                 'width': WIDTH,
                 'height': HEIGHT,
                 'temperatures': pixels,
