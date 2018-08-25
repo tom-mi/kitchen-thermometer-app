@@ -11,33 +11,33 @@ class HeatFrameEnricherTest {
         val SMALL_WIDTH = 3
         val SMALL_HEIGHT = 2
         val RANGE = Pair(0f, 100f)
-        val SMALL_FRAME = HeatFrame(BATTERY, BATTERY_VOLTAGE, SMALL_WIDTH, SMALL_HEIGHT, RANGE.first, RANGE.second, listOf(2f, 1f, 2f, 3f, 4f, 5f))
+        val SMALL_FRAME = HeatFrame(BATTERY, BATTERY_VOLTAGE, RANGE.first, RANGE.second, listOf(listOf(2f, 1f, 2f), listOf(3f, 4f, 5f)))
         val WIDTH = 5
         val HEIGHT = 6
-        val FRAME = HeatFrame(BATTERY, BATTERY_VOLTAGE, WIDTH, HEIGHT, RANGE.first, RANGE.second,
+        val FRAME = HeatFrame(BATTERY, BATTERY_VOLTAGE, RANGE.first, RANGE.second,
                 listOf(
-                        0f, 0f, 1f, 1f, 0f,
-                        0f, 0f, 1f, 1f, 0f,
-                        2f, 0f, 0f, 0f, 0f,
-                        0f, 0f, 0f, 0f, 0f,
-                        0f, -1f, 0f, 3f, 0f,
-                        0f, 0f, 0f, 0f, 0f
+                        listOf(0f, 0f, 1f, 1f, 0f),
+                        listOf(0f, 0f, 1f, 1f, 0f),
+                        listOf(2f, 0f, 0f, 0f, 0f),
+                        listOf(0f, 0f, 0f, 0f, 0f),
+                        listOf(0f, -1f, 0f, 3f, 0f),
+                        listOf(0f, 0f, 0f, 0f, 0f)
                 ))
-        val MAX_FRAME = HeatFrame(BATTERY, BATTERY_VOLTAGE, 5, 5, RANGE.first, RANGE.second,
+        val MAX_FRAME = HeatFrame(BATTERY, BATTERY_VOLTAGE, RANGE.first, RANGE.second,
                 listOf(
-                        0f, 0f, 0f, 0f, 0f,
-                        0f, 0f, 0f, 0f, 0f,
-                        0f, 0f, 1f, 0f, 0f,
-                        0f, 0f, 0f, 0f, 0f,
-                        0f, 0f, 0f, 0f, 0f
+                        listOf(0f, 0f, 0f, 0f, 0f),
+                        listOf(0f, 0f, 0f, 0f, 0f),
+                        listOf(0f, 0f, 1f, 0f, 0f),
+                        listOf(0f, 0f, 0f, 0f, 0f),
+                        listOf(0f, 0f, 0f, 0f, 0f)
                 ))
-        val MIN_FRAME = HeatFrame(BATTERY, BATTERY_VOLTAGE, 5, 5, RANGE.first, RANGE.second,
+        val MIN_FRAME = HeatFrame(BATTERY, BATTERY_VOLTAGE, RANGE.first, RANGE.second,
                 listOf(
-                        0f, 0f, 0f, 0f, 0f,
-                        0f, 0f, 0f, 0f, 0f,
-                        0f, 0f, -1f, 0f, 0f,
-                        0f, 0f, 0f, 0f, 0f,
-                        0f, 0f, 0f, 0f, 0f
+                        listOf(0f, 0f, 0f, 0f, 0f),
+                        listOf(0f, 0f, 0f, 0f, 0f),
+                        listOf(0f, 0f, -1f, 0f, 0f),
+                        listOf(0f, 0f, 0f, 0f, 0f),
+                        listOf(0f, 0f, 0f, 0f, 0f)
                 ))
         val SCALE = 5
     }

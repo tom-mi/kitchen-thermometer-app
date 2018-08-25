@@ -37,15 +37,13 @@ def main():
 
 
 def handle(conn):
-    pixels = [i * 13 % 100 for i in range(WIDTH * HEIGHT)]
+    pixels = [[20 for _ in range(WIDTH)] for _ in range(HEIGHT)]
     while 1:
         try:
             randomize(pixels)
             data = {
                 'battery': 0.5,
                 'batteryVoltage': 3.9,
-                'width': WIDTH,
-                'height': HEIGHT,
                 'temperatures': pixels,
                 'temperatureRangeMin': 0.,
                 'temperatureRangeMax': 100.,
@@ -61,8 +59,9 @@ def handle(conn):
 
 def randomize(pixels):
     for i in range(len(pixels)):
-        pixels[i] += (random.random() - 0.5) * 10
-        pixels[i] = max(0, min(50., pixels[i]))
+        for j in range(len(pixels[i])):
+            pixels[i][j] += (random.random() - 0.5) * 10
+            pixels[i][j] = max(0, min(50., pixels[i][j]))
 
 
 
